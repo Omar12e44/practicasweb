@@ -1,9 +1,11 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Login from './auth/login'
-import Register from './auth/register'
-import Dashboard from './pages/home'
-import ManipulateDOM from './pages/manipuleDOOM'
+import Login from './pages/LoginPage/LoginPage'
+import Register from './pages/RegisterPage/RegisterPage'
+import Dashboard from './pages/Dashboard/DashboardPage'
+import MainLayout from './layouts/MainLayouts'
+import PrivateRoute from './components/Private/PrivateRoute'
+
 
 function App() {
 
@@ -13,9 +15,16 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/manipulador" element={<ManipulateDOM />} />
-
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
   )
