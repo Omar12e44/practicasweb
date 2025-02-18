@@ -4,3 +4,84 @@
   border: none;
   display: block;
 }
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f0f2f5;
+}
+
+.login-card {
+  width: 350px;
+  padding: 20px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.login-title {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.register-link {
+  display: block;
+  text-align: center;
+  color: #1890ff;
+  margin-top: 10px;
+}
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+}
+
+.register-card {
+  width: 400px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.register-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.register-label {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.register-input {
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.register-button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.register-login-link {
+  text-align: center;
+  display: block;
+  margin-top: 15px;
+}
