@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import api from "../../services/api"; // Importa la instancia de Axios con los interceptores
 import { Form, Input, Button, message, Card } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 
 const Login: React.FC = () => {
@@ -78,8 +78,8 @@ const Login: React.FC = () => {
           </Form.Item>
         </Form>
 
-        <a href="/register" className="register-link">¿No tienes cuenta? Regístrate</a>
-      </Card>
+        <Link to="/register" className="register-link">¿No tienes cuenta? Regístrate</Link>
+        </Card>
     </div>
   );
 };

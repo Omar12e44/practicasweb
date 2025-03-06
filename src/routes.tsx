@@ -12,7 +12,7 @@ const AppRoutes = () => {
       {/* Rutas públicas */}
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      
+            
       {/* Rutas protegidas (requieren autenticación) */}
       <Route
         path="/dashboard"
