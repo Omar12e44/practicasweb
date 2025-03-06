@@ -310,7 +310,7 @@ const Grupos = () => {
     <DatePicker 
         showTime 
         format="YYYY-MM-DD HH:mm:ss" 
-        onChange={(date, dateString) => setTareaDetails({ ...tareaDetails, deadLine: String(dateString) })}
+        onChange={(_date, dateString) => setTareaDetails({ ...tareaDetails, deadLine: String(dateString) })}
     />
 </Form.Item>
   </Form>
