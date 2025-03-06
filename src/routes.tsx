@@ -1,16 +1,19 @@
-import { Routes, Route } from 'react-router-dom'
-import Login from './pages/LoginPage/LoginPage'
-import Register from './pages/RegisterPage/RegisterPage'
-import Dashboard from './pages/Dashboard/DashboardPage'
-import MainLayout from './layouts/MainLayouts'
-import PrivateRoute from './components/Private/PrivateRoute'
-import Grupos from './pages/GrupoPage/GrupoPage'
+import { Routes, Route } from 'react-router-dom';
+import Login from './pages/LoginPage/LoginPage';
+import Register from './pages/RegisterPage/RegisterPage';
+import Dashboard from './pages/Dashboard/DashboardPage';
+import MainLayout from './layouts/MainLayouts';
+import PrivateRoute from './components/Private/PrivateRoute';
+import Grupos from './pages/GrupoPage/GrupoPage';
 
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Rutas públicas */}
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      
+      {/* Rutas protegidas */}
       <Route
         path="/dashboard"
         element={
@@ -30,9 +33,9 @@ const AppRoutes = () => {
             </MainLayout>
           </PrivateRoute>
         }
-        />
+      />
     </Routes>
-  )
+  );
 }
 
-export default AppRoutes
+export default AppRoutes;
