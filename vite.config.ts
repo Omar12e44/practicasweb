@@ -1,6 +1,5 @@
-// vite.config.ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react-swc';
 
 export default defineConfig({
   plugins: [react()],
@@ -8,14 +7,13 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ["react", "react-dom", "react-router-dom"],
+          vendor: ['react', 'react-dom', 'react-router-dom'],
         },
       },
     },
   },
   server: {
-    // Elimina 'historyApiFallback', ya que no es necesario en Vite
+    // No necesitas configurar 'fsServe'
   },
-  base: "/", // Si está en la raíz de tu dominio, usa '/'
-  // Si tu app está en un subdirectorio, usa: base: '/mi-app/'
+  base: '/',  // Si la app está en la raíz del dominio
 });
