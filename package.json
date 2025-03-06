@@ -14,6 +14,7 @@
     "@tailwindcss/vite": "^4.0.11",
     "@types/axios": "^0.9.36",
     "antd": "^5.24.0",
+    "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
     "flowbite-react": "^0.10.2",
     "ogl": "^1.0.11",

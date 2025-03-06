@@ -2,8 +2,11 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import api from "../../services/api"; // Importa la instancia de Axios con los interceptores
 import { Form, Input, Button, message, Card } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
 
 
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -30,10 +33,7 @@ const Login: React.FC = () => {
         localStorage.setItem("token", response.data.data.token);
         localStorage.setItem("rol", response.data.data.rol); // Almacena el rol en el localStorage
         localStorage.setItem("id_usuario", response.data.data.id_usuario); // Almacena el id_usuario
-
-
-        message.success("Inicio de sesión exitoso");
-        window.location.href = "/dashboard";
+        navigate("/dashboard");
       } else {
         message.error(response.data.intMessage || "Credenciales inválidas");
       }
