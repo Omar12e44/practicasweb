@@ -3,13 +3,13 @@ import axios from "axios";
 import { Input, Button, Card, Typography, message } from "antd";
 
 const { Title, Text } = Typography;
+const apiUrl = "https://practicaswebback.onrender.com";
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
     email: "",
-    rol: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -24,16 +24,18 @@ const Register: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
+    const dataToSend = { ...formData, rol: "worker" };
+
     try {
       const response = await axios.post<{ statusCode: number; intMessage?: string }>(
-        "http://127.0.0.1:5000/register",
-        formData
+        `${apiUrl}/register`,
+        dataToSend
       );
 
       if (response.data.statusCode === 201) {
         message.success("Usuario registrado con éxito. Ahora puedes iniciar sesión.");
         // Limpiar formulario
-        setFormData({ username: "", password: "", email: "", rol: "" });
+        setFormData({ username: "", password: "", email: "" });
       } else {
         message.error(response.data.intMessage || "Error al registrar usuario.");
       }
@@ -74,19 +76,6 @@ const Register: React.FC = () => {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="Ingrese su correo"
-              required
-              className="register-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="register-label">Rol:</label>
-            <Input
-              type="text"
-              name="rol"
-              value={formData.rol}
-              onChange={handleInputChange}
-              placeholder="Ingrese su rol"
               required
               className="register-input"
             />

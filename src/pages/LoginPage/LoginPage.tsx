@@ -1,9 +1,11 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
-import axios from "axios";
+import api from "../../services/api"; // Importa la instancia de Axios con los interceptores
 import { Form, Input, Button, message, Card } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 const Login: React.FC = () => {
+
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -17,15 +19,19 @@ const Login: React.FC = () => {
 
     interface LoginResponse {
       statusCode: number;
-      data: { token: string };
+      data: { token: string; rol: string; id_usuario: string};
       intMessage?: string;
     }
 
     try {
-      const response = await axios.post<LoginResponse>("http://127.0.0.1:5000/login", formData);
+      const response = await api.post<LoginResponse>("/login", formData); // Usamos api en lugar de axios
 
       if (response.data.statusCode === 200) {
         localStorage.setItem("token", response.data.data.token);
+        localStorage.setItem("rol", response.data.data.rol); // Almacena el rol en el localStorage
+        localStorage.setItem("id_usuario", response.data.data.id_usuario); // Almacena el id_usuario
+
+
         message.success("Inicio de sesión exitoso");
         window.location.href = "/dashboard";
       } else {

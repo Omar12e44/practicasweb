@@ -3,10 +3,12 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UploadOutlined,
-  UserOutlined,
   VideoCameraOutlined,
+  CheckSquareOutlined,
 } from '@ant-design/icons';
-import { Button, Layout, Menu, theme } from 'antd';
+import { Button, Layout, Menu, theme, message } from 'antd';
+import { Link } from 'react-router-dom';
+
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -21,6 +23,15 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     token: {  borderRadiusLG },
   } = theme.useToken();
 
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("rol");
+    localStorage.removeItem("id_usuario");
+    
+    message.success("Sesión cerrada correctamente");
+    window.location.href = "/"; // Redirige al login
+  };
   return (
     <Layout style={{ minHeight: '100vh', overflow: 'hidden' }}>
       {/* Barra lateral */}
@@ -50,13 +61,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           items={[
             {
               key: '1',
-              icon: <UserOutlined />,
-              label: 'nav 1',
+              icon: <CheckSquareOutlined />,
+              label: <Link to="/dashboard">Tareas</Link>,
             },
             {
               key: '2',
               icon: <VideoCameraOutlined />,
-              label: 'nav 2',
+              label: <Link to="/grupos">Grupos</Link>,
             },
             {
               key: '3',
@@ -71,7 +82,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </Sider>
 
       {/* Contenido principal */}
-      <Layout style={{ marginLeft: collapsed ? 80 : 240, transition: 'margin-left 0.3s' }}>
+      <Layout style={{ marginLeft: collapsed ? 80 : 240, transition: 'margin-left 0.3s', backgroundColor: '#F8F9FA' }}>
         {/* Header */}
         <Header
           style={{
@@ -97,6 +108,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               color: 'white', // Color blanco para el ícono
             }}
           />
+          <Button type="default" onClick={handleLogout}>
+  Cerrar Sesión
+</Button>
         </Header>
 
         {/* Content */}
@@ -104,7 +118,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           style={{
             margin: '24px 16px',
             padding: 24,
-            background: '#f4f7fa', // Fondo claro para el contenido
+            background: '#F8F9FA', // Fondo claro para el contenido
             borderRadius: borderRadiusLG,
             flex: 1, // Asegura que el contenido ocupe el espacio restante
           }}

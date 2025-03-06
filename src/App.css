@@ -1,3 +1,9 @@
+.app-containerbody {
+  background-color: #34495e;
+  min-height: 100vh; /* Para ocupar toda la pantalla */
+  padding: 20px;
+}
+
 .squares-canvas {
   width: 100%;
   height: 100%;
