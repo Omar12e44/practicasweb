@@ -3,11 +3,14 @@ import { useState } from "react";
 import { Modal, Form, Input, Select, DatePicker, Button, message } from "antd";
 import dayjs from "dayjs";  
 
+
 interface TaskFormProps {
   onTaskCreated?: () => void;
 }
 
 const { Option } = Select;
+const apiUrl = "https://practicaswebback.onrender.com";
+
 
 interface TaskForm {
   nameTask: string;
@@ -43,7 +46,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onTaskCreated }) => {
       console.log("Datos de la tarea que se enviarán:", taskData);
 
 
-      const response = await fetch("http://127.0.0.1:5000/create_task", {
+      const response = await fetch(`${apiUrl}/create_task`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

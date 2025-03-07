@@ -72,7 +72,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             {
               key: '3',
               icon: <UploadOutlined />,
-              label: 'nav 3',
+              label: <Link to="/users">Usuarios</Link>,
             },
           ]}
           style={{

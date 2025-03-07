@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard/DashboardPage';
 import MainLayout from './layouts/MainLayouts';
 import PrivateRoute from './components/Private/PrivateRoute';
 import Grupos from './pages/GrupoPage/GrupoPage';
+import UserList from './pages/Users/users';
 
 const AppRoutes = () => {
   return (
@@ -33,6 +34,16 @@ const AppRoutes = () => {
             </MainLayout>
           </PrivateRoute>
         }
+      />
+      <Route
+      path='/users'
+      element={
+        <PrivateRoute>
+          <MainLayout>
+            <UserList />
+          </MainLayout>
+        </PrivateRoute>
+      }
       />
     </Routes>
   );

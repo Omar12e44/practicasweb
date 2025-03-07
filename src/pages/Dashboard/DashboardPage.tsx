@@ -1,20 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, message } from "antd";
+import { Table, Button, Modal, Form, Select, message } from "antd";
 import BlurText from "../../blocks/TextAnimations/BlurText/BlurText";
 import "../../App.css";
 import TaskForm from "../../components/Task/TaskForm";
 
+const { Option } = Select;
+
 const Dashboard = () => {
   interface Task {
     uid: string;
-    id: string;
+    id_tarea: string;
     nameTask: string;
     descripcion: string;
     categoria: string;
     estatus: string;
     deadLine: string | number | Date;
+    grupo: string;
   }
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -23,11 +26,7 @@ const Dashboard = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [form] = Form.useForm();
 
-
-  //https://practicaswebback.onrender.com
-  //http://127.0.0.1:5000
   const apiUrl = "https://practicaswebback.onrender.com";
-
 
   // Obtener tareas
   const fetchTasks = async () => {
@@ -67,7 +66,7 @@ const Dashboard = () => {
       // Asegúrate de asignar el ID del documento correctamente
       setTasks(result.data.map((task: Task) => ({
         ...task,
-        id: task.id, // Asegúrate de que cada tarea tenga el 'id' del documento de Firestore
+        id_tarea: task.id_tarea, // Asegúrate de que cada tarea tenga el 'id_tarea' del documento de Firestore
       })));
     } catch (error) {
       console.error("❌ Error al obtener tareas:", error);
@@ -75,7 +74,6 @@ const Dashboard = () => {
       setTasks([]);
     }
   };
-
 
   const fetchTasksByGroup = async () => {
     const token = localStorage.getItem("token");
@@ -146,6 +144,7 @@ const Dashboard = () => {
       if (response.ok) {
         message.success("Tarea eliminada con éxito");
         fetchTasks(); // Actualizar la tabla
+        fetchTasksByGroup(); // Actualizar la tabla de tareas por grupo
       } else {
         message.error(result.intMessage || "Error al eliminar la tarea");
       }
@@ -160,13 +159,10 @@ const Dashboard = () => {
     setSelectedTask(task);
     setIsModalVisible(true);
     form.setFieldsValue(task);
-  
   };
 
   // Función para guardar cambios en la tarea
   const handleSaveChanges = async () => {
-    
-    
     const token = localStorage.getItem("token");
     if (!token || !selectedTask) return;
   
@@ -174,14 +170,15 @@ const Dashboard = () => {
   
     try {
       const values = await form.validateFields();
-      // Cambié 'selectedTask.uid' por 'selectedTask.id', que debe ser el ID del documento
-      const response = await fetch(`${apiUrl}/update_task/${selectedTask.id}`, {  // Usa 'id' aquí
+      // Incluye el ID de la tarea y el ID del grupo en los valores del formulario
+      const updatedTask = { ...values, id_tarea: selectedTask.id_tarea, grupo: selectedTask.grupo };
+      const response = await fetch(`${apiUrl}/update_task/${selectedTask.grupo}/${selectedTask.id_tarea}`, {  // Usa 'grupo' y 'id_tarea' aquí
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(updatedTask),
       });
   
       const result = await response.json();
@@ -190,6 +187,7 @@ const Dashboard = () => {
         message.success("Tarea actualizada con éxito");
         setIsModalVisible(false);
         fetchTasks(); // Recargar las tareas
+        fetchTasksByGroup(); // Recargar las tareas por grupo
       } else {
         message.error(result.intMessage || "Error al actualizar la tarea");
       }
@@ -198,7 +196,6 @@ const Dashboard = () => {
       message.error("Error de conexión con el servidor");
     }
   };
-  
 
   // Columnas de la tabla con botones de acción
   const columns = [
@@ -215,13 +212,12 @@ const Dashboard = () => {
     {
       title: "Acciones",
       key: "acciones",
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       render: (_: any, record: Task) => (
         <>
-          <Button type="primary" onClick={() => handleEditTask(record)}   style={{ marginRight: 8 }}>
+          <Button type="primary" onClick={() => handleEditTask(record)} style={{ marginRight: 8 }}>
             Editar
           </Button>
-          <Button type="default" danger onClick={() => handleDeleteTask(record.uid)}>
+          <Button type="default" danger onClick={() => handleDeleteTask(record.id_tarea)}>
             Eliminar
           </Button>
         </>
@@ -254,9 +250,6 @@ const Dashboard = () => {
           <Button type="primary" onClick={() => handleEditTask(record)} style={{ marginRight: 8 }}>
             Editar
           </Button>
-          <Button type="default" danger onClick={() => handleDeleteTask(record.id)}>
-            Eliminar
-          </Button>
         </>
       ),
     },
@@ -272,8 +265,8 @@ const Dashboard = () => {
         className="text-2xl mb-8 text-center"
       />
       <TaskForm onTaskCreated={fetchTasks} />
-      <Table dataSource={tasks} columns={columns} rowKey={(record) => record.id} title={() =>'Tareas Generales'} />
-      <Table dataSource={tasksByGroup} columns={columnsByGroup} rowKey={(record) => record.id} title={() => 'Tareas por Grupo'} />
+      <Table dataSource={tasks} columns={columns} rowKey={(record) => record.id_tarea} title={() =>'Tareas Generales'} />
+      <Table dataSource={tasksByGroup} columns={columnsByGroup} rowKey={(record) => record.id_tarea} title={() => 'Tareas por Grupo'} />
 
       {/* Modal de edición */}
       <Modal
@@ -283,20 +276,12 @@ const Dashboard = () => {
         onOk={handleSaveChanges}
       >
         <Form form={form} layout="vertical">
-          <Form.Item label="Nombre" name="nameTask" rules={[{ required: true, message: "Campo obligatorio" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="Descripción" name="descripcion">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Categoría" name="categoria">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Estatus" name="estatus">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Fecha Límite" name="deadLine">
-            <Input />
+          <Form.Item label="Estatus" name="estatus" rules={[{ required: true, message: "Campo obligatorio" }]}>
+            <Select>
+              <Option value="pendiente">Pendiente</Option>
+              <Option value="completado">Completado</Option>
+              <Option value="terminado">Terminado</Option>
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
