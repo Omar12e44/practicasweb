@@ -88,6 +88,7 @@ const Grupos = () => {
   };
 
   const handleCrearGrupo = async () => {
+    console.log("Token:", token);
     if (!token || !nuevoGrupo.trim()) return;
     try {
       await crearGrupo(nuevoGrupo);
@@ -296,12 +297,18 @@ const Grupos = () => {
         onChange={(e) => setTareaDetails({ ...tareaDetails, categoria: e.target.value })}
       />
     </Form.Item>
-    <Form.Item label="Estatus">
-      <Input
-        value={tareaDetails.estatus}
-        onChange={(e) => setTareaDetails({ ...tareaDetails, estatus: e.target.value })}
-      />
-    </Form.Item>
+     <Form.Item label="Estatus">
+    <Select
+      value={tareaDetails.estatus}
+      onChange={(value) => setTareaDetails({ ...tareaDetails, estatus: value })}
+      style={{ width: '100%' }}
+    >
+      <Select.Option value="Pendiente">Pendiente</Select.Option>
+      <Select.Option value="En proceso">En proceso</Select.Option>
+      <Select.Option value="Revisión">Revisión</Select.Option>
+      <Select.Option value="Completado">Completado</Select.Option>
+    </Select>
+  </Form.Item>
     <Form.Item 
     label="Fecha de Vencimiento"
     name="deadLine"

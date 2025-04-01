@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, message } from "antd";
+import { Table, Button, Modal, Form, Input, message, Select } from "antd";
 import BlurText from "../../blocks/TextAnimations/BlurText/BlurText";
 import "../../App.css";
 import TaskForm from "../../components/Task/TaskForm";
 
 const Dashboard = () => {
   interface Task {
+    id_tarea: any;
+    grupo: any;
     uid: string;
     id: string;
     nameTask: string;
@@ -22,8 +24,10 @@ const Dashboard = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [form] = Form.useForm();
+  const [rol, setRol] = useState<string | null>(null); // Estado para almacenar el rol del usuario
 
-  const apiUrl = "https://practicaswebback.onrender.com";
+  //const apiUrl = "https://practicaswebback.onrender.com";
+  const apiUrl = "http://127.0.0.1:5000"; // URL de la API local (opcional)
 
 
   // Obtener tareas
@@ -76,12 +80,12 @@ const Dashboard = () => {
 
   const fetchTasksByGroup = async () => {
     const token = localStorage.getItem("token");
-
+  
     if (!token) {
       message.error("No se encontró el token de autenticación.");
       return;
     }
-
+  
     try {
       const response = await fetch(`${apiUrl}/tareas_usuario_grupo`, {
         method: "GET",
@@ -90,9 +94,9 @@ const Dashboard = () => {
           "Authorization": `Bearer ${token}`,
         },
       });
-
+  
       const result = await response.json();
-
+  
       if (!response.ok) {
         if (result.error === "Token expirado") {
           message.warning("⚠️ La sesión ha expirado. Inicia sesión nuevamente.");
@@ -102,23 +106,31 @@ const Dashboard = () => {
         }
         throw new Error(result.error || "Error al obtener las tareas por grupo");
       }
-
+  
       if (!Array.isArray(result)) {
         throw new Error("La respuesta de la API no contiene una lista de tareas.");
       }
-
+  
+      // Mapea los datos para asegurarte de que los campos necesarios estén presentes
+      const tasks = result.map((task: Task) => ({
+        ...task,
+        grupo: task.grupo, // Asegúrate de que este campo esté presente
+        id_tarea: task.id_tarea, // Asegúrate de que este campo esté presente
+      }));
+  
       // Asignamos los datos obtenidos al estado
-      setTasksByGroup(result);
+      setTasksByGroup(tasks);
     } catch (error) {
       console.error("❌ Error al obtener tareas por grupo:", error);
       message.error("Error de conexión con el servidor");
       setTasksByGroup([]);
     }
   };
-  
   useEffect(() => {
     fetchTasks();
     fetchTasksByGroup();
+    const userRol = localStorage.getItem("rol");
+    setRol(userRol); // Guardar el rol del usuario en el estado
   }, []);
 
   // Función para eliminar una tarea
@@ -162,8 +174,6 @@ const Dashboard = () => {
 
   // Función para guardar cambios en la tarea
   const handleSaveChanges = async () => {
-    
-    
     const token = localStorage.getItem("token");
     if (!token || !selectedTask) return;
   
@@ -171,12 +181,23 @@ const Dashboard = () => {
   
     try {
       const values = await form.validateFields();
-      // Cambié 'selectedTask.uid' por 'selectedTask.id', que debe ser el ID del documento
-      const response = await fetch(`${apiUrl}/update_task/${selectedTask.id}`, {  // Usa 'id' aquí
+
+      console.log("Valores del formulario:", values); // Verifica los valores del formulario
+  
+      // Obtén el group_id y task_id de la tarea seleccionada
+      const groupId = selectedTask.grupo; // Campo correcto para el group_id
+      const taskId = selectedTask.id_tarea; // Campo correcto para el task_id
+  
+      if (!groupId || !taskId) {
+        throw new Error("group_id o task_id no están definidos");
+      }
+  
+      // Construye la URL con los parámetros correctos
+      const response = await fetch(`${apiUrl}/update_task/${groupId}/${taskId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(values),
       });
@@ -186,7 +207,7 @@ const Dashboard = () => {
       if (response.ok) {
         message.success("Tarea actualizada con éxito");
         setIsModalVisible(false);
-        fetchTasks(); // Recargar las tareas
+        fetchTasksByGroup(); // Recargar las tareas por grupo
       } else {
         message.error(result.intMessage || "Error al actualizar la tarea");
       }
@@ -195,7 +216,45 @@ const Dashboard = () => {
       message.error("Error de conexión con el servidor");
     }
   };
+
+
+  const handleSaveGeneralTask = async () => {
+    const token = localStorage.getItem("token");
+    if (!token || !selectedTask) return;
   
+    try {
+      const values = await form.validateFields();
+      console.log("Valores del formulario (tarea general):", values);
+  
+      const taskId = selectedTask.id; // Usar el campo `id` para tareas generales
+  
+      if (!taskId) {
+        throw new Error("task_id no está definido");
+      }
+  
+      const response = await fetch(`${apiUrl}/update_general_task/${taskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(values),
+      });
+  
+      const result = await response.json();
+  
+      if (response.ok) {
+        message.success("Tarea general actualizada con éxito");
+        setIsModalVisible(false);
+        fetchTasks(); // Recargar las tareas generales
+      } else {
+        message.error(result.intMessage || "Error al actualizar la tarea general");
+      }
+    } catch (error) {
+      console.error("❌ Error al actualizar tarea general:", error);
+      message.error("Error de conexión con el servidor");
+    }
+  };
 
   // Columnas de la tabla con botones de acción
   const columns = [
@@ -218,7 +277,7 @@ const Dashboard = () => {
           <Button type="primary" onClick={() => handleEditTask(record)}   style={{ marginRight: 8 }}>
             Editar
           </Button>
-          <Button type="default" danger onClick={() => handleDeleteTask(record.uid)}>
+          <Button type="default" danger onClick={() => handleDeleteTask(record.id)}>
             Eliminar
           </Button>
         </>
@@ -251,9 +310,11 @@ const Dashboard = () => {
           <Button type="primary" onClick={() => handleEditTask(record)} style={{ marginRight: 8 }}>
             Editar
           </Button>
-          <Button type="default" danger onClick={() => handleDeleteTask(record.id)}>
-            Eliminar
-          </Button>
+          {rol === "admin" && (
+        <Button type="default" danger onClick={() => handleDeleteTask(record.id)}>
+          Eliminar
+        </Button>
+      )}
         </>
       ),
     },
@@ -274,29 +335,46 @@ const Dashboard = () => {
 
       {/* Modal de edición */}
       <Modal
-        title="Editar Tarea"
-        open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        onOk={handleSaveChanges}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item label="Nombre" name="nameTask" rules={[{ required: true, message: "Campo obligatorio" }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="Descripción" name="descripcion">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Categoría" name="categoria">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Estatus" name="estatus">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Fecha Límite" name="deadLine">
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
+  title="Editar Tarea"
+  open={isModalVisible}
+  onCancel={() => setIsModalVisible(false)}
+  onOk={() => {
+    if (selectedTask?.grupo) {
+      handleSaveChanges(); // Guardar tarea por grupo
+    } else {
+      handleSaveGeneralTask(); // Guardar tarea general
+    }
+  }}
+>
+  <Form form={form} layout="vertical">
+    {rol === "admin" && (
+      <>
+        <Form.Item label="Nombre" name="nameTask" rules={[{ required: true, message: "Campo obligatorio" }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item label="Descripción" name="descripcion">
+          <Input />
+        </Form.Item>
+        <Form.Item label="Categoría" name="categoria">
+          <Input />
+        </Form.Item>
+      </>
+    )}
+    <Form.Item label="Estatus" name="estatus" rules={[{ required: true, message: "Campo obligatorio" }]}>
+      <Select>
+        <Select.Option value="Pendiente">Pendiente</Select.Option>
+        <Select.Option value="En proceso">En proceso</Select.Option>
+        <Select.Option value="Completado">Completado</Select.Option>
+      <Select.Option value="Revisión">Revisión</Select.Option>
+      </Select>
+    </Form.Item>
+    {rol === "admin" && (
+      <Form.Item label="Fecha Límite" name="deadLine">
+        <Input />
+      </Form.Item>
+    )}
+  </Form>
+</Modal>
     </div>
   );
 };

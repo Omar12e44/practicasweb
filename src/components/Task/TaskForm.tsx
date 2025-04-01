@@ -117,6 +117,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onTaskCreated }) => {
               <Option value="Pendiente">Pendiente</Option>
               <Option value="En progreso">En progreso</Option>
               <Option value="Completado">Completado</Option>
+              <option value="En revision">Revisión</option>
             </Select>
           </Form.Item>
 

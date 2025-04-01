@@ -51,13 +51,13 @@ const Login: React.FC = () => {
         <h1 className="login-title">Iniciar Sesión</h1>
 
         <Form layout="vertical" onSubmitCapture={handleSubmit}>
-          <Form.Item label="Usuario" name="email" rules={[{ required: true, message: "Ingrese su usuario" }]}>
+          <Form.Item label="Correo" name="email" rules={[{ required: true, message: "Ingrese su usuario" }]}>
             <Input
               prefix={<UserOutlined />}
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder="Ingrese su usuario"
+              placeholder="Ingrese su correo"
             />
           </Form.Item>
 
