@@ -17,6 +17,7 @@ const Dashboard = () => {
     categoria: string;
     estatus: string;
     deadLine: string | number | Date;
+    grupo_name?: string; // Nombre del grupo (opcional)
   }
 
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -107,15 +108,16 @@ const Dashboard = () => {
         throw new Error(result.error || "Error al obtener las tareas por grupo");
       }
   
-      if (!Array.isArray(result)) {
+      if (!Array.isArray(result.data)) {
         throw new Error("La respuesta de la API no contiene una lista de tareas.");
       }
   
       // Mapea los datos para asegurarte de que los campos necesarios estén presentes
-      const tasks = result.map((task: Task) => ({
+      const tasks = result.data.map((task: Task) => ({
         ...task,
-        grupo: task.grupo, // Asegúrate de que este campo esté presente
-        id_tarea: task.id_tarea, // Asegúrate de que este campo esté presente
+        grupo: task.grupo, // ID del grupo
+        grupo_name: task.grupo_name, // Nombre del grupo
+        id_tarea: task.id_tarea, // ID de la tarea
       }));
   
       // Asignamos los datos obtenidos al estado
@@ -126,6 +128,8 @@ const Dashboard = () => {
       setTasksByGroup([]);
     }
   };
+
+
   useEffect(() => {
     fetchTasks();
     fetchTasksByGroup();
@@ -298,9 +302,9 @@ const Dashboard = () => {
       render: (text: string | number | Date) => text ? new Intl.DateTimeFormat("es-ES").format(new Date(text)) : "No definida"
     },
     {
-      title: "Grupo",
-      dataIndex: "grupo",
-      key: "grupo",
+      title: "Grupo", // Nueva columna para el nombre del grupo
+      dataIndex: "grupo_name",
+      key: "grupo_name",
     },
     {
       title: "Acciones",

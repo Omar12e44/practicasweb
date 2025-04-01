@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -18,10 +18,17 @@ const { Header, Sider, Content } = Layout;
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [role, setRole] = useState<string | null>(null); // Estado para almacenar el rol del usuario
+
 
   const {
     token: {  borderRadiusLG },
   } = theme.useToken();
+
+  useEffect(() => {
+    const storedRole = localStorage.getItem('rol');
+    setRole(storedRole);
+  }, []);
 
 
   const handleLogout = () => {
@@ -64,16 +71,20 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               icon: <CheckSquareOutlined />,
               label: <Link to="/dashboard">Tareas</Link>,
             },
-            {
-              key: '2',
-              icon: <VideoCameraOutlined />,
-              label: <Link to="/grupos">Grupos</Link>,
-            },
-            {
-              key: '3',
-              icon: <UploadOutlined />,
-              label: 'nav 3',
-            },
+            ...(role === 'admin'
+              ? [
+                  {
+                    key: '2',
+                    icon: <VideoCameraOutlined />,
+                    label: <Link to="/grupos">Grupos</Link>,
+                  },
+                  {
+                    key: '3',
+                    icon: <UploadOutlined />,
+                    label: <Link to="/usuarios">Usuarios</Link>,
+                  },
+                ]
+              : []),
           ]}
           style={{
             background: '#003366', 
