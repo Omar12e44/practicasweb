@@ -14,8 +14,8 @@ const CrudUsers = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null); // Usuario en edición
   const [form] = Form.useForm();
 
-  const apiUrl = "http://127.0.0.1:5000"; // Cambia esto por la URL de tu API
-  //const apiUrl = "https://practicaswebback.onrender.com";
+  //const apiUrl = "http://127.0.0.1:5000"; // Cambia esto por la URL de tu API
+  const apiUrl = "https://practicaswebback.onrender.com";
 
   // Obtener usuarios
   const fetchUsers = async () => {
