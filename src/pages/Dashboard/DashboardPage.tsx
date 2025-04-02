@@ -27,8 +27,8 @@ const Dashboard = () => {
   const [form] = Form.useForm();
   const [rol, setRol] = useState<string | null>(null); // Estado para almacenar el rol del usuario
 
-  //const apiUrl = "https://practicaswebback.onrender.com";
-  const apiUrl = "http://127.0.0.1:5000"; // URL de la API local (opcional)
+  const apiUrl = "https://practicaswebback.onrender.com";
+  //const apiUrl = "http://127.0.0.1:5000"; // URL de la API local (opcional)
 
 
   // Obtener tareas
