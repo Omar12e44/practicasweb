@@ -43,7 +43,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onTaskCreated }) => {
       console.log("Datos de la tarea que se enviarán:", taskData);
 
 
-      const response = await fetch("http://127.0.0.1:5000/create_task", {
+      const response = await fetch("https://practicaswebback.onrender.com/create_task", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
