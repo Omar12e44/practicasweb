@@ -170,12 +170,18 @@ const Dashboard = () => {
 
   // Función para abrir el modal de edición
   const handleEditTask = (task: Task) => {
-    setSelectedTask(task);
-    setIsModalVisible(true);
-    form.setFieldsValue(task);
+    setSelectedTask(task); // Establece la tarea seleccionada
+    setIsModalVisible(true); // Muestra el modal
   
+    // Configura los valores del formulario con los datos de la tarea seleccionada
+    form.setFieldsValue({
+      nameTask: task.nameTask || "", // Nombre de la tarea
+      descripcion: task.descripcion || "", // Descripción de la tarea
+      categoria: task.categoria || "", // Categoría de la tarea
+      estatus: task.estatus || "", // Estatus de la tarea
+      deadLine: task.deadLine || "", // Fecha límite de la tarea
+    });
   };
-
   // Función para guardar cambios en la tarea
   const handleSaveChanges = async () => {
     const token = localStorage.getItem("token");
@@ -351,9 +357,14 @@ const Dashboard = () => {
   }}
 >
   <Form form={form} layout="vertical">
-    {rol === "admin" && (
+    {/* Mostrar todos los campos si es una tarea general o si el usuario es admin */}
+    {(!selectedTask?.grupo || rol === "admin") && (
       <>
-        <Form.Item label="Nombre" name="nameTask" rules={[{ required: true, message: "Campo obligatorio" }]}>
+        <Form.Item
+          label="Nombre"
+          name="nameTask"
+          rules={[{ required: true, message: "Campo obligatorio" }]}
+        >
           <Input />
         </Form.Item>
         <Form.Item label="Descripción" name="descripcion">
@@ -364,14 +375,20 @@ const Dashboard = () => {
         </Form.Item>
       </>
     )}
-    <Form.Item label="Estatus" name="estatus" rules={[{ required: true, message: "Campo obligatorio" }]}>
+    {/* Campo de estatus siempre visible */}
+    <Form.Item
+      label="Estatus"
+      name="estatus"
+      rules={[{ required: true, message: "Campo obligatorio" }]}
+    >
       <Select>
         <Select.Option value="Pendiente">Pendiente</Select.Option>
         <Select.Option value="En proceso">En proceso</Select.Option>
         <Select.Option value="Completado">Completado</Select.Option>
-      <Select.Option value="Revisión">Revisión</Select.Option>
+        <Select.Option value="Revisión">Revisión</Select.Option>
       </Select>
     </Form.Item>
+    {/* Mostrar fecha límite solo si es admin */}
     {rol === "admin" && (
       <Form.Item label="Fecha Límite" name="deadLine">
         <Input />
