@@ -14,8 +14,8 @@ const CrudUsers = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null); // Usuario en edición
   const [form] = Form.useForm();
 
-  //const apiUrl = "http://127.0.0.1:5000"; // Cambia esto por la URL de tu API
-  const apiUrl = "https://practicaswebback.onrender.com";
+  const apiUrl = "http://127.0.0.1:5000"; // Cambia esto por la URL de tu API
+  //const apiUrl = "https://practicaswebback.onrender.com";
 
   // Obtener usuarios
   const fetchUsers = async () => {
@@ -34,37 +34,67 @@ const CrudUsers = () => {
     }
   };
 
-  // Crear o actualizar usuario
+  // Crear usuario
+  const createUser = async (values: { email: string; rol: string; userName: string; password: string }) => {
+    try {
+      const response = await fetch(`${apiUrl}/add_users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: values.email,
+          rol: values.rol,
+          username: values.userName,
+          password: values.password, // Enviar la contraseña al backend
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al crear el usuario.");
+      }
+
+      message.success("Usuario creado con éxito.");
+      fetchUsers(); // Recargar la lista de usuarios
+    } catch (error) {
+      console.error("Error al crear usuario:", error);
+      message.error("Error al crear el usuario.");
+    }
+  };
+
+  // Actualizar usuario
+  const updateUser = async (values: { email: string; rol: string; userName: string }) => {
+    try {
+      const response = await fetch(`${apiUrl}/update_users/${editingUser?.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: values.email,
+          rol: values.rol,
+          username: values.userName,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar el usuario.");
+      }
+
+      message.success("Usuario actualizado con éxito.");
+      fetchUsers(); // Recargar la lista de usuarios
+    } catch (error) {
+      console.error("Error al actualizar usuario:", error);
+      message.error("Error al actualizar el usuario.");
+    }
+  };
+
+  // Guardar usuario (crear o actualizar)
   const handleSaveUser = async () => {
     try {
       const values = await form.validateFields();
       if (editingUser) {
-        // Actualizar usuario
-        await fetch(`${apiUrl}/update_users/${editingUser.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: values.email,
-            rol: values.rol,
-            username: values.userName,
-          }),
-        });
-        message.success("Usuario actualizado con éxito.");
+        await updateUser(values); // Llamar a la función de actualización
       } else {
-        // Crear usuario
-        await fetch(`${apiUrl}/add_users`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: values.email,
-            rol: values.rol,
-            username: values.userName,
-          }),
-        });
-        message.success("Usuario creado con éxito.");
+        await createUser(values); // Llamar a la función de creación
       }
       setIsModalVisible(false);
-      fetchUsers(); // Recargar la lista de usuarios
     } catch (error) {
       console.error("Error al guardar usuario:", error);
       message.error("Error al guardar el usuario.");
@@ -173,6 +203,15 @@ const CrudUsers = () => {
               <Select.Option value="worker">Worker</Select.Option>
             </Select>
           </Form.Item>
+          {!editingUser && ( // Mostrar el campo de contraseña solo al crear un usuario
+            <Form.Item
+              label="Contraseña"
+              name="password"
+              rules={[{ required: true, message: "La contraseña es obligatoria." }]}
+            >
+              <Input.Password />
+            </Form.Item>
+          )}
         </Form>
       </Modal>
     </div>
